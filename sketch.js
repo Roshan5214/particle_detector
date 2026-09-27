@@ -11,14 +11,15 @@ function running() {
 
 const screenWidth = 300;
 const screenHeight = 200;
-const FPS = 60;
 
 function setup() {
+    const FPS = 60;
+
     r.InitWindow(screenWidth, screenHeight, "Particle Detector");
     r.SetTargetFPS(FPS);
 }
 
-let scanner1_direction, scanner2_direction;
+let scanner1_direction, scanner2_direction, scannerV_direction;
 
 function update() {
     scanner1_direction = scanner.scannerDirection(
@@ -38,6 +39,15 @@ function update() {
         scanner2_direction,
     );
     scanner2_x += scanner2_direction * 2;
+
+    scannerV_direction = scanner.scannerDirection(
+        scannerV_y,
+        0,
+        scannerV_height,
+        screenHeight,
+        scannerV_direction,
+    );
+    scannerV_y += scannerV_direction;
 
     scanner1_color = chooseColor(
         scanner.doRangesOverlap(
@@ -62,6 +72,15 @@ function update() {
                 particle1_width,
             ),
     );
+
+    scannerV_color = chooseColor(
+        scanner.doRangesOverlap(
+            scannerV_y,
+            scannerV_height,
+            particleV_y,
+            particleV_height,
+        ),
+    );
 }
 
 let scanner1_x = 0;
@@ -74,7 +93,13 @@ let scanner2_x = screenWidth / 2;
 const scanner2_y = 0;
 const scanner2_width = screenWidth / 15;
 const scanner2_height = screenHeight;
-let scanner2_color = r.WHITE;
+let scanner2_color;
+
+const scannerV_x = 0;
+let scannerV_y = 0;
+const scannerV_width = screenWidth;
+const scannerV_height = screenHeight / 10;
+let scannerV_color;
 
 const particle1_x = screenWidth / 3;
 const particle1_y = 0;
@@ -86,6 +111,11 @@ const particle2_x = screenWidth / 1.5;
 const particle2_y = 0;
 const particle2_width = screenWidth / 60;
 const particle2_height = screenHeight;
+
+const particleV_x = 0;
+const particleV_y = screenHeight / 2.5;
+const particleV_width = screenWidth;
+const particleV_height = screenHeight / 20;
 
 function draw() {
     r.BeginDrawing();
@@ -106,6 +136,13 @@ function draw() {
         particleColor,
     );
     r.DrawRectangle(
+        particleV_x,
+        particleV_y,
+        particleV_width,
+        particleV_height,
+        particleColor,
+    );
+    r.DrawRectangle(
         scanner1_x,
         scanner1_y,
         scanner1_width,
@@ -118,6 +155,14 @@ function draw() {
         scanner2_width,
         scanner2_height,
         scanner2_color,
+    );
+
+    r.DrawRectangle(
+        scannerV_x,
+        scannerV_y,
+        scannerV_width,
+        scannerV_height,
+        scannerV_color,
     );
 
     r.EndDrawing();
