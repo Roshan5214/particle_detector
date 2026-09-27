@@ -1,6 +1,10 @@
 const r = require("raylib");
 const scanner = require("./scanner");
 
+function chooseColor(doRangesOverlap) {
+    return doRangesOverlap ? r.RED : r.WHITE;
+}
+
 function running() {
     return !r.WindowShouldClose();
 }
@@ -25,14 +29,20 @@ function update() {
     );
     scannerX += scannerDirection;
 
-    scannerColor = scanner.areRangesOverlapping(
-        scannerX,
-        scannerWidth,
-        particleX,
-        particleWidth,
-    )
-        ? r.RED
-        : r.WHITE;
+    scannerColor = chooseColor(
+        scanner.doRangesOverlap(
+            scannerX,
+            scannerWidth,
+            particle1_x,
+            particle1_width,
+        ) ||
+            scanner.doRangesOverlap(
+                scannerX,
+                scannerWidth,
+                particle2_x,
+                particle2_width,
+            ),
+    );
 }
 
 let scannerX = 0;
@@ -41,21 +51,33 @@ const scannerWidth = screenWidth / 15;
 const scannerHeight = screenHeight;
 let scannerColor;
 
-const particleX = screenWidth / 3;
-const particleY = 0;
-const particleWidth = screenWidth / 6;
-const particleHeight = screenHeight;
+const particle1_x = screenWidth / 3;
+const particle1_y = 0;
+const particle1_width = screenWidth / 6;
+const particle1_height = screenHeight;
 const particleColor = r.BLUE;
+
+const particle2_x = screenWidth / 1.5;
+const particle2_y = 0;
+const particle2_width = screenWidth / 60;
+const particle2_height = screenHeight;
 
 function draw() {
     r.BeginDrawing();
     r.ClearBackground(r.BLACK);
 
     r.DrawRectangle(
-        particleX,
-        particleY,
-        particleWidth,
-        particleHeight,
+        particle1_x,
+        particle1_y,
+        particle1_width,
+        particle1_height,
+        particleColor,
+    );
+    r.DrawRectangle(
+        particle2_x,
+        particle2_y,
+        particle2_width,
+        particle2_height,
         particleColor,
     );
     r.DrawRectangle(

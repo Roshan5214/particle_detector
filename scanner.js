@@ -13,12 +13,7 @@ function scannerDirection(
     }
 }
 
-function areRangesOverlapping(
-    scannerX,
-    scannerWidth,
-    particleX,
-    particleWidth,
-) {
+function doRangesOverlap(scannerX, scannerWidth, particleX, particleWidth) {
     let d = particleX + particleWidth - scannerX;
     if (d <= scannerWidth + particleWidth && d >= 0) {
         return true;
@@ -28,5 +23,5 @@ function areRangesOverlapping(
 
 module.exports = {
     scannerDirection,
-    areRangesOverlapping,
+    doRangesOverlap,
 };
