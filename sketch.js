@@ -35,6 +35,7 @@ function draw() {
     r.BeginDrawing();
     r.ClearBackground(r.BLACK);
 
+    r.DrawRectangle(100, 0, 50, screenHeight, r.BLUE);
     r.DrawRectangle(x, y, scannerWidth, scannerHeight, r.WHITE);
 
     r.EndDrawing();
