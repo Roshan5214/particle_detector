@@ -24,17 +24,28 @@ function update() {
         scannerDirection,
     );
     scannerX += scannerDirection;
+
+    scannerColor = scanner.areRangesOverlapping(
+        scannerX,
+        scannerWidth,
+        particleX,
+        particleWidth,
+    )
+        ? r.RED
+        : r.WHITE;
 }
 
 let scannerX = 0;
 const scannerY = 0;
-const scannerWidth = 20;
+const scannerWidth = screenWidth / 15;
 const scannerHeight = screenHeight;
+let scannerColor;
 
 const particleX = screenWidth / 3;
 const particleY = 0;
-const particleWidth = 50;
+const particleWidth = screenWidth / 6;
 const particleHeight = screenHeight;
+const particleColor = r.BLUE;
 
 function draw() {
     r.BeginDrawing();
@@ -45,9 +56,15 @@ function draw() {
         particleY,
         particleWidth,
         particleHeight,
-        r.BLUE,
+        particleColor,
     );
-    r.DrawRectangle(scannerX, scannerY, scannerWidth, scannerHeight, r.WHITE);
+    r.DrawRectangle(
+        scannerX,
+        scannerY,
+        scannerWidth,
+        scannerHeight,
+        scannerColor,
+    );
 
     r.EndDrawing();
 }
