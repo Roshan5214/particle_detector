@@ -18,25 +18,36 @@ let scannerDirection;
 
 function update() {
     scannerDirection = scanner.scannerDirection(
-        x,
+        scannerX,
         scannerWidth,
         screenWidth,
         scannerDirection,
     );
-    x += scannerDirection;
+    scannerX += scannerDirection;
 }
 
-let x = 0;
-let y = 0;
+let scannerX = 0;
+const scannerY = 0;
 const scannerWidth = 20;
 const scannerHeight = screenHeight;
+
+const particleX = screenWidth / 3;
+const particleY = 0;
+const particleWidth = 50;
+const particleHeight = screenHeight;
 
 function draw() {
     r.BeginDrawing();
     r.ClearBackground(r.BLACK);
 
-    r.DrawRectangle(100, 0, 50, screenHeight, r.BLUE);
-    r.DrawRectangle(x, y, scannerWidth, scannerHeight, r.WHITE);
+    r.DrawRectangle(
+        particleX,
+        particleY,
+        particleWidth,
+        particleHeight,
+        r.BLUE,
+    );
+    r.DrawRectangle(scannerX, scannerY, scannerWidth, scannerHeight, r.WHITE);
 
     r.EndDrawing();
 }
