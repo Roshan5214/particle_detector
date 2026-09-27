@@ -1,12 +1,7 @@
-function scannerDirection(
-    scannerX,
-    scannerWidth,
-    screenWidth,
-    scannerDirection,
-) {
-    if (scannerX === 0) {
+function scannerDirection(current, start, scannerWidth, end, scannerDirection) {
+    if (current === start) {
         return 1;
-    } else if (scannerX + scannerWidth === screenWidth) {
+    } else if (current + scannerWidth >= end) {
         return -1;
     } else {
         return scannerDirection;
