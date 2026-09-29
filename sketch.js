@@ -1,169 +1,113 @@
 const r = require("raylib");
-const scanner = require("./scanner");
+const d = require("./detector");
+const d1 = require("./detector1");
+const d2 = require("./detector2");
+const d3 = require("./detector3");
 
-function chooseColor(doRangesOverlap) {
-    return doRangesOverlap ? r.RED : r.WHITE;
-}
+let field1Start;
+const field1Width = 50;
+
+let field2Start;
+const field2Width = 10;
+
+let field3Start;
+const field3Width = 30;
 
 function running() {
     return !r.WindowShouldClose();
 }
 
-const screenWidth = 300;
-const screenHeight = 200;
+function setup(width, height, title) {
+    r.SetTraceLogLevel(r.LOG_NONE);
+    r.InitWindow(width, height, title);
+    r.SetTargetFPS(60);
 
-function setup() {
-    const FPS = 60;
-
-    r.InitWindow(screenWidth, screenHeight, "Particle Detector");
-    r.SetTargetFPS(FPS);
+    field1Start = width / 3;
+    field2Start = width / 1.5;
+    field3Start = height / 2.5;
+    d2.start = width / 2;
 }
 
-let scanner1_direction, scanner2_direction, scannerV_direction;
+function hasDetectorDetectedAnyField(ds, dw, fs1, fw1, fs2, fw2) {
+    return (
+        d.hasDetectorDetected(ds, dw, fs1, fw1) ||
+        d.hasDetectorDetected(ds, dw, fs2, fw2)
+    );
+}
 
 function update() {
-    scanner1_direction = scanner.scannerDirection(
-        scanner1_x,
+    d1.velocity = d.calculateDetectorVelocity(
+        d1.start,
+        d1.start + d1.width,
         0,
-        scanner1_width,
-        screenWidth / 2,
-        scanner1_direction,
+        r.GetScreenWidth() / 2,
+        d1.velocity,
     );
-    scanner1_x += scanner1_direction * 1;
+    d1.start = d.calculateDetectorPosition(d1.start, d1.velocity);
 
-    scanner2_direction = scanner.scannerDirection(
-        scanner2_x,
-        screenWidth / 2,
-        scanner2_width,
-        screenWidth,
-        scanner2_direction,
+    d2.velocity = d.calculateDetectorVelocity(
+        d2.start,
+        d2.start + d2.width,
+        r.GetScreenWidth() / 2,
+        r.GetScreenWidth(),
+        d2.velocity,
     );
-    scanner2_x += scanner2_direction * 2;
+    d2.start = d.calculateDetectorPosition(d2.start, d2.velocity);
 
-    scannerV_direction = scanner.scannerDirection(
-        scannerV_y,
+    d3.velocity = d.calculateDetectorVelocity(
+        d3.start,
+        d3.start + d3.width,
         0,
-        scannerV_height,
-        screenHeight,
-        scannerV_direction,
+        r.GetScreenHeight(),
+        d3.velocity,
     );
-    scannerV_y += scannerV_direction;
+    d3.start = d.calculateDetectorPosition(d3.start, d3.velocity);
 
-    scanner1_color = chooseColor(
-        scanner.doRangesOverlap(
-            scanner1_x,
-            scanner1_width,
-            particle1_x,
-            particle1_width,
-        ),
-    );
-
-    scanner2_color = chooseColor(
-        scanner.doRangesOverlap(
-            scanner2_x,
-            scanner2_width,
-            particle2_x,
-            particle2_width,
-        ) ||
-            scanner.doRangesOverlap(
-                scanner2_x,
-                scanner2_width,
-                particle1_x,
-                particle1_width,
-            ),
+    let hasField1Detected = hasDetectorDetectedAnyField(
+        d1.start,
+        d1.width,
+        field1Start,
+        field1Width,
+        field2Start,
+        field2Width,
     );
 
-    scannerV_color = chooseColor(
-        scanner.doRangesOverlap(
-            scannerV_y,
-            scannerV_height,
-            particleV_y,
-            particleV_height,
-        ),
+    d1.color = d.chooseDetectorColor(hasField1Detected);
+
+    let hasField2Detected = hasDetectorDetectedAnyField(
+        d2.start,
+        d2.width,
+        field1Start,
+        field1Width,
+        field2Start,
+        field2Width,
     );
+
+    d2.color = d.chooseDetectorColor(hasField2Detected);
+
+    let hasField3Detected = d.hasDetectorDetected(
+        d3.start,
+        d3.width,
+        field3Start,
+        field3Width,
+    );
+
+    d3.color = d.chooseDetectorColor(hasField3Detected);
 }
-
-let scanner1_x = 0;
-const scanner1_y = 0;
-const scanner1_width = screenWidth / 15;
-const scanner1_height = screenHeight;
-let scanner1_color;
-
-let scanner2_x = screenWidth / 2;
-const scanner2_y = 0;
-const scanner2_width = screenWidth / 15;
-const scanner2_height = screenHeight;
-let scanner2_color;
-
-const scannerV_x = 0;
-let scannerV_y = 0;
-const scannerV_width = screenWidth;
-const scannerV_height = screenHeight / 10;
-let scannerV_color;
-
-const particle1_x = screenWidth / 3;
-const particle1_y = 0;
-const particle1_width = screenWidth / 6;
-const particle1_height = screenHeight;
-const particleColor = r.BLUE;
-
-const particle2_x = screenWidth / 1.5;
-const particle2_y = 0;
-const particle2_width = screenWidth / 60;
-const particle2_height = screenHeight;
-
-const particleV_x = 0;
-const particleV_y = screenHeight / 2.5;
-const particleV_width = screenWidth;
-const particleV_height = screenHeight / 20;
 
 function draw() {
     r.BeginDrawing();
     r.ClearBackground(r.BLACK);
 
-    r.DrawRectangle(
-        particle1_x,
-        particle1_y,
-        particle1_width,
-        particle1_height,
-        particleColor,
-    );
-    r.DrawRectangle(
-        particle2_x,
-        particle2_y,
-        particle2_width,
-        particle2_height,
-        particleColor,
-    );
-    r.DrawRectangle(
-        particleV_x,
-        particleV_y,
-        particleV_width,
-        particleV_height,
-        particleColor,
-    );
-    r.DrawRectangle(
-        scanner1_x,
-        scanner1_y,
-        scanner1_width,
-        scanner1_height,
-        scanner1_color,
-    );
-    r.DrawRectangle(
-        scanner2_x,
-        scanner2_y,
-        scanner2_width,
-        scanner2_height,
-        scanner2_color,
-    );
+    d.drawHorizontalField(field1Start, field1Width);
+    d.drawHorizontalField(field2Start, field2Width);
 
-    r.DrawRectangle(
-        scannerV_x,
-        scannerV_y,
-        scannerV_width,
-        scannerV_height,
-        scannerV_color,
-    );
+    d.drawVerticalField(field3Start, field3Width);
+
+    d.drawHorizontalDetector(d1.start, d1.width, d1.color);
+    d.drawHorizontalDetector(d2.start, d2.width, d2.color);
+
+    d.drawVerticalDetector(d3.start, d3.width, d3.color);
 
     r.EndDrawing();
 }
