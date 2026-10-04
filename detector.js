@@ -1,51 +1,67 @@
 const r = require("raylib");
 
-function isDetectorOutOfbounds(start1, end1, start2, end2) {
-    return end1 > end2 || start1 < start2;
+function createDetector(start, width, velocity, hasDetected, axis) {
+    return { start, width, velocity, hasDetected, axis };
 }
 
-function calculateDetectorVelocity(s1, e1, s2, e2, velocity) {
-    return isDetectorOutOfbounds(s1, e1, s2, e2) ? -velocity : velocity;
+function update(detector, field1, start, end, field2) {
+    detector.start = calculatePosition(detector, start, end);
+    detector.hasDetected =
+        overlaps(detector, field1) || overlaps(detector, field2);
+    detector.color = chooseColor(detector);
 }
 
-function calculateDetectorPosition(start, velocity) {
-    return start + velocity;
+function chooseColor(detector) {
+    return detector.hasDetected ? r.RED : r.WHITE;
 }
 
-function hasDetectorDetected(start1, width1, start2, width2) {
-    const end1 = start1 + width1;
-    const end2 = start2 + width2;
+function draw(detector) {
+    if (detector.axis === "x") {
+        r.DrawRectangle(
+            detector.start,
+            0,
+            detector.width,
+            r.GetScreenHeight(),
+            detector.color,
+        );
+        return;
+    }
+    r.DrawRectangle(
+        0,
+        detector.start,
+        r.GetScreenWidth(),
+        detector.width,
+        detector.color,
+    );
+}
+
+function isOutOfbounds(detector, start1, end1) {
+    const start2 = detector.start;
+    const end2 = detector.start + detector.width;
+    return end2 > end1 || start2 < start1;
+}
+
+function calculateVelocity(detector, start, end) {
+    detector.velocity = isOutOfbounds(detector, start, end)
+        ? -detector.velocity
+        : detector.velocity;
+    return detector.velocity;
+}
+
+function calculatePosition(detector, start, end) {
+    return detector.start + calculateVelocity(detector, start, end);
+}
+
+function overlaps(detector, field) {
+    const start1 = detector.start;
+    const end1 = detector.start + detector.width;
+    const start2 = field.start;
+    const end2 = field.start + field.width;
     return !(end1 < start2 || end2 < start1);
 }
 
-function chooseDetectorColor(hasDetectorDetected) {
-    return hasDetectorDetected ? r.RED : r.WHITE;
-}
-
-function drawHorizontalField(x, w) {
-    r.DrawRectangle(x, 0, w, r.GetScreenHeight(), r.BLUE);
-}
-
-function drawHorizontalDetector(x, w, color) {
-    r.DrawRectangle(x, 0, w, r.GetScreenHeight(), color);
-}
-
-function drawVerticalField(y, h) {
-    r.DrawRectangle(0, y, r.GetScreenWidth(), h, r.BLUE);
-}
-
-function drawVerticalDetector(y, h, color) {
-    r.DrawRectangle(0, y, r.GetScreenWidth(), h, color);
-}
-
 module.exports = {
-    isDetectorOutOfbounds,
-    calculateDetectorVelocity,
-    calculateDetectorPosition,
-    hasDetectorDetected,
-    chooseDetectorColor,
-    drawHorizontalField,
-    drawHorizontalDetector,
-    drawVerticalField,
-    drawVerticalDetector,
+    createDetector,
+    update,
+    draw,
 };
